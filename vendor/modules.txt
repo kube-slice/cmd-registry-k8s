@@ -74,13 +74,13 @@ github.com/modern-go/concurrent
 # github.com/modern-go/reflect2 v1.0.1
 ## explicit
 github.com/modern-go/reflect2
-# github.com/networkservicemesh/api v1.5.0
+# github.com/networkservicemesh/api v1.6.1
 ## explicit; go 1.18
 github.com/networkservicemesh/api/pkg/api
 github.com/networkservicemesh/api/pkg/api/networkservice
 github.com/networkservicemesh/api/pkg/api/networkservice/payload
 github.com/networkservicemesh/api/pkg/api/registry
-# github.com/networkservicemesh/sdk v1.5.0 => github.com/kubeslice/nsm-sdk v1.5.3-kbs
+# github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.6.2-kbs-vl3.0.20250926090406-873a93d79719
 ## explicit; go 1.18
 github.com/networkservicemesh/sdk/pkg/registry
 github.com/networkservicemesh/sdk/pkg/registry/common/begin

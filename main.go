@@ -21,7 +21,7 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
+	"google.golang.org/grpc/credentials/insecure"
 	"net/url"
 	"os"
 	"os/signal"
@@ -38,16 +38,12 @@ import (
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
-	"github.com/spiffe/go-spiffe/v2/spiffetls/tlsconfig"
-	"github.com/spiffe/go-spiffe/v2/workloadapi"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-
 	"github.com/networkservicemesh/sdk/pkg/tools/debug"
 	"github.com/networkservicemesh/sdk/pkg/tools/grpcutils"
 	"github.com/networkservicemesh/sdk/pkg/tools/log"
 	"github.com/networkservicemesh/sdk/pkg/tools/log/logruslogger"
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 // Config is configuration for cmd-registry-memory
@@ -56,7 +52,7 @@ type Config struct {
 	ListenOn              []url.URL `default:"unix:///listen.on.socket" desc:"url to listen on." split_words:"true"`
 	LogLevel              string    `default:"INFO" desc:"Log level" split_words:"true"`
 	OpenTelemetryEndpoint string    `default:"otel-collector.observability.svc.cluster.local:4317" desc:"OpenTelemetry Collector Endpoint"`
-	KubeletQPS             int           `default:"10" desc:"kubelet config settings" split_words:"true"`
+	KubeletQPS            int       `default:"10" desc:"kubelet config settings" split_words:"true"`
 }
 
 func main() {
@@ -103,7 +99,7 @@ func main() {
 	if opentelemetry.IsEnabled() {
 		collectorAddress := config.OpenTelemetryEndpoint
 		spanExporter := opentelemetry.InitSpanExporter(ctx, collectorAddress)
-                metricExporter := opentelemetry.InitOPTLMetricExporter(ctx, collectorAddress, 60*time.Second)
+		metricExporter := opentelemetry.InitOPTLMetricExporter(ctx, collectorAddress, 60*time.Second)
 		o := opentelemetry.Init(ctx, spanExporter, metricExporter, "registry-k8s")
 		defer func() {
 			if err = o.Close(); err != nil {
@@ -113,24 +109,8 @@ func main() {
 	}
 
 	// Get a X509Source
-	source, err := workloadapi.NewX509Source(ctx)
-	if err != nil {
-		logrus.Fatalf("error getting x509 source: %+v", err)
-	}
-	svid, err := source.GetX509SVID()
-	if err != nil {
-		logrus.Fatalf("error getting x509 svid: %+v", err)
-	}
-	logrus.Infof("SVID: %q", svid.ID)
-
-	tlsClientConfig := tlsconfig.MTLSClientConfig(source, source, tlsconfig.AuthorizeAny())
-	tlsClientConfig.MinVersion = tls.VersionTLS12
-	tlsServerConfig := tlsconfig.MTLSServerConfig(source, source, tlsconfig.AuthorizeAny())
-	tlsServerConfig.MinVersion = tls.VersionTLS12
-
-	credsTLS := credentials.NewTLS(tlsServerConfig)
 	// Create GRPC Server and register services
-	serverOptions := append(tracing.WithTracing(), grpc.Creds(credsTLS))
+	serverOptions := append(tracing.WithTracing(), grpc.Creds(grpcfd.TransportCredentials(insecure.NewCredentials())))
 	server := grpc.NewServer(serverOptions...)
 
 	clientOptions := append(
@@ -139,9 +119,7 @@ func main() {
 		grpc.WithDefaultCallOptions(grpc.WaitForReady(true)),
 		grpc.WithTransportCredentials(
 			grpcfd.TransportCredentials(
-				credentials.NewTLS(
-					tlsClientConfig,
-				),
+				insecure.NewCredentials(),
 			),
 		),
 	)
@@ -184,4 +162,3 @@ func newVersionedClient(config *Config) (*versioned.Clientset, error) {
 	k8sConfig.Burst = config.KubeletQPS * 2
 	return versioned.NewForConfig(k8sConfig)
 }
-

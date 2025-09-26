@@ -13,7 +13,7 @@ require (
 	google.golang.org/grpc v1.59.0
 )
 
-replace github.com/networkservicemesh/sdk v1.5.0 => github.com/kubeslice/nsm-sdk v1.5.3-kbs
+replace github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.6.2-kbs-vl3.0.20250926090406-873a93d79719
 
 require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
@@ -33,7 +33,7 @@ require (
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/networkservicemesh/api v1.5.0 // indirect
+	github.com/networkservicemesh/api v1.6.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/zeebo/errs v1.2.2 // indirect
