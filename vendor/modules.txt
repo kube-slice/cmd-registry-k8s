@@ -96,7 +96,7 @@ github.com/networkservicemesh/api/pkg/api
 github.com/networkservicemesh/api/pkg/api/networkservice
 github.com/networkservicemesh/api/pkg/api/networkservice/payload
 github.com/networkservicemesh/api/pkg/api/registry
-# github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.7.0-ac-vl3
+# github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.6.0-ac-nsmgr
 ## explicit; go 1.24.0
 github.com/networkservicemesh/sdk/pkg/registry
 github.com/networkservicemesh/sdk/pkg/registry/common/begin

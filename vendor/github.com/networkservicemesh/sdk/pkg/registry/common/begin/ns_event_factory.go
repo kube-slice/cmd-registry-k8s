@@ -43,7 +43,11 @@ func newEventNSFactoryClient(ctx context.Context, afterClose func(), opts ...grp
 		client: next.NetworkServiceRegistryClient(ctx),
 		opts:   opts,
 	}
-	f.updateContext(ctx)
+	ctxFunc := postpone.ContextWithValues(ctx)
+	f.ctxFunc = func() (context.Context, context.CancelFunc) {
+		eventCtx, cancel := ctxFunc()
+		return withEventFactory(eventCtx, f), cancel
+	}
 
 	f.afterCloseFunc = func() {
 		f.state = closed
@@ -52,14 +56,6 @@ func newEventNSFactoryClient(ctx context.Context, afterClose func(), opts ...grp
 		}
 	}
 	return f
-}
-
-func (f *eventNSFactoryClient) updateContext(ctx context.Context) {
-	ctxFunc := postpone.ContextWithValues(ctx)
-	f.ctxFunc = func() (context.Context, context.CancelFunc) {
-		eventCtx, cancel := ctxFunc()
-		return withEventFactory(eventCtx, f), cancel
-	}
 }
 
 func (f *eventNSFactoryClient) Register(opts ...Option) <-chan error {
@@ -133,21 +129,17 @@ func newNSEventFactoryServer(ctx context.Context, afterClose func()) *eventNSFac
 	f := &eventNSFactoryServer{
 		server: next.NetworkServiceRegistryServer(ctx),
 	}
-	f.updateContext(ctx)
+	ctxFunc := postpone.ContextWithValues(ctx)
+	f.ctxFunc = func() (context.Context, context.CancelFunc) {
+		eventCtx, cancel := ctxFunc()
+		return withEventFactory(eventCtx, f), cancel
+	}
 
 	f.afterCloseFunc = func() {
 		f.state = closed
 		afterClose()
 	}
 	return f
-}
-
-func (f *eventNSFactoryServer) updateContext(ctx context.Context) {
-	ctxFunc := postpone.ContextWithValues(ctx)
-	f.ctxFunc = func() (context.Context, context.CancelFunc) {
-		eventCtx, cancel := ctxFunc()
-		return withEventFactory(eventCtx, f), cancel
-	}
 }
 
 func (f *eventNSFactoryServer) Register(opts ...Option) <-chan error {

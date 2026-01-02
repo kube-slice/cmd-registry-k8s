@@ -13,7 +13,7 @@ require (
 	google.golang.org/grpc v1.78.0
 )
 
-replace github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.7.0-ac-vl3
+replace github.com/networkservicemesh/sdk v1.5.0 => github.com/kube-slice/nsm-sdk v1.6.0-ac-nsmgr
 
 require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
